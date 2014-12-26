@@ -1,4 +1,4 @@
-package com.nightgunners.util;
+package com.nightgunners.game;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -13,7 +13,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.nightgunners.game.NightGunners;
+import com.nightgunners.util.TileColors;
+import com.nightgunners.characters.Player;
 import com.nightgunners.entities.Bullet;
 import com.nightgunners.entities.Tile;
 import com.nightgunners.entities.TileGrass;

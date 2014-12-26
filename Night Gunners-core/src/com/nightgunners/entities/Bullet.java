@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.nightgunners.util.GameScreen;
-import com.nightgunners.util.Player;
+import com.nightgunners.characters.Player;
+import com.nightgunners.game.GameScreen;
 
 public class Bullet {
 	   
