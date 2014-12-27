@@ -14,14 +14,14 @@ public class Bullet {
 	   static final Rectangle screenBounds = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	   
 	   Vector3 position, velocity, acceleration;
-	   Texture sprite;
+	   Texture texture;
 	   
 	   public Vector3 target;
-	   static Rectangle Bb;
+	   public static Rectangle Bb;
 	   Player player;
 	   
-	   public Bullet(Texture sprite, Player player) {
-		  this.sprite = sprite;
+	   public Bullet(Texture texture, Player player) {
+		  this.texture = texture;
 		  this.player = player;
 		  reset();
 	      Bb = new Rectangle(0, 0, 10, 10);
@@ -41,7 +41,7 @@ public class Bullet {
 	   }
 	   
 	   public void render(SpriteBatch batch) {
-	      batch.draw(sprite, position.x, position.y);
+	      batch.draw(texture, position.x, position.y);
 	      Bb.setX(position.x);
 	      Bb.setY(position.y);
 	   }

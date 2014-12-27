@@ -13,10 +13,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.nightgunners.util.ScreenShaker;
 import com.nightgunners.util.TileColors;
+import com.nightgunners.characters.Enemy;
 import com.nightgunners.characters.Player;
 import com.nightgunners.entities.Bullet;
 import com.nightgunners.entities.Tile;
+import com.nightgunners.entities.TileEnemy;
 import com.nightgunners.entities.TileGrass;
 import com.nightgunners.entities.TileStone;
 import com.nightgunners.entities.TileWater;
@@ -32,7 +35,9 @@ public class GameScreen implements Screen{
 	
 	//SPRITES
 	Sprite player;
-	Player p;
+	public static Player p;
+	ArrayList<Sprite> snapbackEnemy;
+	ArrayList<Enemy> enemies;
 	
 	//ENTITIES
 	ArrayList<Bullet> bullets;
@@ -49,9 +54,12 @@ public class GameScreen implements Screen{
 	Texture grassTex;
 	Texture stoneTex;
 	
-	Texture penis;
+	//TOOLS
+	ScreenShaker ss;
+	boolean shot = false;
 	
 	//LEVELS
+	String lvlImg = "level_DEMO.png";
 	int lvl = 0;
 	
 	public GameScreen(NightGunners ng){
@@ -93,7 +101,12 @@ public class GameScreen implements Screen{
 				}}}
 			//CHARACTERS
 			player.draw(batch);
-			batch.draw(penis, 100, 100);
+			System.out.println(p.getX() + "pladf" + p.getY());
+			for(Enemy e: enemies) {
+				Sprite s = new Sprite(new Texture("Thug_GUNNER.png"));
+				s.setPosition(e.getX(), e.getY());
+				s.draw(batch);
+			}
 			
 			//ENTITIES
 			for (Bullet b : bullets) {
@@ -110,16 +123,34 @@ public class GameScreen implements Screen{
 		if(!isPaused){
 			p.update();
 			player.setPosition(p.getX(), p.getY());
+			ss.tick(delta);
 			checkInput();
 			mouseMove();
+			checkHit();
+		}
+	}
+	
+	void checkHit() {
+		for(Bullet b: bullets) {
+			for(Enemy e: enemies) {
+				if(b.Bb.overlaps(e.getBounds())) {e.setX(50000);} //send the enemy far far away when hit
+				
+			}
+			
 		}
 	}
 	
 	void checkInput() {
 		//MOUSE
-		if(Gdx.input.isButtonPressed(1)) {
-			
+		if(Gdx.input.isButtonPressed(1) && !shot) {
+			shot = true;
+			//if(bullets per click = 1)
 			bullets.add(new Bullet(new Texture("Bullet.png"), p));
+			ss.rumble(10, 1);
+		}
+		
+		if(!Gdx.input.isButtonPressed(1) && shot) {
+			shot = false;
 		}
 		
 	}
@@ -134,7 +165,8 @@ public class GameScreen implements Screen{
 	         player.setRotation(degreesToMouse);
 	       
 	}
-
+	
+	
 	public void show() {
 	initMusic();
 	initImages();
@@ -148,7 +180,13 @@ public class GameScreen implements Screen{
 	
 	void initLevel() {
 		try {
-			BufferedImage image = ImageIO.read(this.getClass().getResource("level_DEMO.png"));
+			if(lvl == -1) {lvlImg = "level_DEMO.png";}
+			if(lvl == 0) {lvlImg = "level_0.png";}
+			BufferedImage image = ImageIO.read(this.getClass().getResource(lvlImg)); //NOTE: java.awt is drawn
+																					 //from different coords so
+																					 //make all buffered images
+																				 	 //upside-down or libGdx 
+																					 //will draw them upside-down
 			width = image.getWidth();
 			height = image.getHeight();
 			
@@ -159,60 +197,74 @@ public class GameScreen implements Screen{
 					System.out.println(tiles[x][y]);
 					//GRASS
 					if(image.getRGB(x, y) == TileColors.grassTile){
-
 						tiles[x][y] = new TileGrass(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, false, true, false, false, false, false);
+					
 					//SODA
 					}else if(image.getRGB(x, y) == TileColors.sodaTile){
-
 						tiles[x][y] = new TileSoda(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, false, false, false, false, true, false);
+					
 					//GOAL
 					}else if(image.getRGB(x, y) == TileColors.goal){
-
 						goalTileX = x;
 						goalTileY = y;
 						tiles[x][y] = new TileGoal(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, false, true, true, false, false, false);
+					
 					//STONE
 					}else if(image.getRGB(x, y) == TileColors.stoneTile){
-						
 						tiles[x][y] = new TileStone(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, false, false, false, false, false, true);
+					
 					//SPAWN
 					}else if(image.getRGB(x, y) == TileColors.playerSpawn){
-
 						p.setX(x * Tile.TILE_SIZE);
 						p.setY(y * Tile.TILE_SIZE);
 						tiles[x][y] = new TileGrass(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, false, true, false, false, false, false);
+					
 					//WATER
 					}else if(image.getRGB(x, y) == TileColors.waterTile){
-
 						tiles[x][y] = new TileWater(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, true, false, false, true, false, false);
+					
+					//ENEMY (on stone)
+					}else if(image.getRGB(x, y) == TileColors.enemystoneTile) {
+						tiles[x][y] = new TileEnemy(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, false, false, false, false, false, true);
+						enemies.add(new Enemy(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE));
+						
+					//ENEMY (on grass)
+					}else if(image.getRGB(x, y) == TileColors.enemygrassTile) {
+						tiles[x][y] = new TileEnemy(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, false, true, false, false, false, false);
+						enemies.add(new Enemy(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE));
+						
 					//DEFAULT
 					}else{
 
 						tiles[x][y] = new TileGrass(x * Tile.TILE_SIZE, y * Tile.TILE_SIZE, false, true, false, false, false, false);
 
 					}
-					System.out.println(tiles[x][y]);
 
 				}
 			}
 			
-			
+		
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		
+	
 	}
 	
 	void initEntities() {
 		//CHARACTERS
 		p = new Player(10,20);
+		enemies = new ArrayList<Enemy>();
+	//	enemies.add(new)
 		
 		
 		//OBJECTS
 		bullets = new ArrayList<Bullet>();
+		
+		//TOOLS
+		ss = new ScreenShaker();
 		
 	}
 
@@ -223,7 +275,8 @@ public class GameScreen implements Screen{
 	void initImages() {
 		batch = new SpriteBatch();	
 		player = new Sprite(new Texture("Gripper_EMPTY.png"));
-		penis = new Texture(Gdx.files.internal("Thug_GUNNER.png"));
+		snapbackEnemy = new ArrayList<Sprite>();
+		
 		
 		//TILES
 		waterTex = new Texture(Gdx.files.internal("tile_WATER_dark.png"));
@@ -261,3 +314,6 @@ public class GameScreen implements Screen{
 
 //TODO: Add tile array (Phasedd)
 //TODO: Add UI
+//TODO: Add gun enum with intensity, name, etc
+//TODO: Fix collision bounds for bullet and enemy
+//TODO: Increase performance by rendering what's in square'

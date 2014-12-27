@@ -16,4 +16,8 @@ public class TileColors {
 	
 	public static final int sodaTile = new Color(255, 106, 0).getRGB();//orange
 	
+	public static final int enemystoneTile = new Color(255, 0, 0).getRGB();//red
+	
+	public static final int enemygrassTile = new Color(255, 0, 220).getRGB();//pink
+	
 }
