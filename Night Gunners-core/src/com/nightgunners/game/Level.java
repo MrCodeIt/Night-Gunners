@@ -13,7 +13,9 @@ import com.nightgunners.entities.TileStone;
 import com.nightgunners.entities.TileWater;
 import com.nightgunners.util.Assets;
 import com.nightgunners.util.TileColors;
-
+/*
+	Author: Phased
+*/
 public class Level {
 	private GameScreen game;
 	private Tile[][] tiles;
