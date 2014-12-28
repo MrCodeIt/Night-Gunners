@@ -1,8 +1,11 @@
 package com.nightgunners.entities;
 
+import com.nightgunners.util.Assets;
+
 public class TileSoda extends Tile{
 
-	public TileSoda(int x, int y, boolean solid, boolean grassTile, boolean goalTile, boolean waterTile, boolean sodaTile, boolean stoneTile) {
-		super( x,  y,  solid,  grassTile,  goalTile,  waterTile,  sodaTile,  stoneTile);
+	public TileSoda(int x, int y) {
+		super( x,  y);
+		texture = Assets.sodaTex;
 	}
 }
